@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Code2 } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { PhasesSidebar } from "./PhasesSidebar";
+import { Workspace } from "./Workspace";
 import { useToast } from "@/hooks/use-toast";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -18,6 +19,7 @@ export const ChatInterface = () => {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showWorkspace, setShowWorkspace] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -144,13 +146,24 @@ export const ChatInterface = () => {
     <div className="flex h-screen bg-background">
       <PhasesSidebar />
       
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="border-b border-border p-6">
-          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            DevBuddy Chat
-          </h1>
-          <p className="text-sm text-muted-foreground">Ask anything about DevOps</p>
+        <header className="border-b border-border p-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              DevBuddy Chat
+            </h1>
+            <p className="text-sm text-muted-foreground">Ask anything about DevOps</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowWorkspace(!showWorkspace)}
+            className="gap-2"
+          >
+            <Code2 className="w-4 h-4" />
+            {showWorkspace ? "Hide" : "Show"} Workspace
+          </Button>
         </header>
 
         {/* Messages */}
@@ -198,6 +211,12 @@ export const ChatInterface = () => {
           </div>
         </div>
       </main>
+
+      {showWorkspace && (
+        <div className="w-[500px] flex-shrink-0">
+          <Workspace />
+        </div>
+      )}
     </div>
   );
 };
