@@ -3,7 +3,7 @@
 
 ## 🚀 Overview
 
-DevBuddy is a personalized AI-powered chatbot designed to teach me DevOps concepts, practices, and tools in an interactive and engaging way. Whether you're just starting your DevOps journey or looking to deepen your expertise, DevBuddy provides tailored learning experiences adapted to your pace and skill level.
+DevBuddy is my personalized AI-powered chatbot designed to teach me DevOps concepts, practices, and tools in an interactive and engaging way. Whether you're just starting your DevOps journey or looking to deepen your expertise, DevBuddy provides tailored learning experiences adapted to your pace and skill level.
 
 ## ✨ Features
 
