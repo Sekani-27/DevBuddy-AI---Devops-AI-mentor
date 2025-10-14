@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, Trash2, Code, Terminal } from "lucide-react";
+import { Save, Trash2, Code, Terminal, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 type WorkspaceTab = "bash" | "docker" | "python" | "terraform" | "notes";
 
@@ -17,6 +18,8 @@ export const Workspace = () => {
     terraform: "",
     notes: "",
   });
+  const [output, setOutput] = useState<string>("");
+  const [isRunning, setIsRunning] = useState<boolean>(false);
   const { toast } = useToast();
 
   // Load saved content from localStorage
@@ -49,6 +52,47 @@ export const Workspace = () => {
 
   const handleContentChange = (value: string) => {
     setContent(prev => ({ ...prev, [activeTab]: value }));
+  };
+
+  const handleRun = async () => {
+    if (activeTab === "notes") {
+      toast({
+        title: "Cannot execute",
+        description: "Notes cannot be executed.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsRunning(true);
+    setOutput("Running...");
+
+    try {
+      const { data, error } = await supabase.functions.invoke("execute-code", {
+        body: {
+          code: content[activeTab],
+          language: activeTab,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.error) {
+        setOutput(`Error:\n${data.error}`);
+      } else {
+        setOutput(data.output || "No output");
+      }
+    } catch (error) {
+      console.error("Execution error:", error);
+      setOutput(`Error: ${error instanceof Error ? error.message : "Unknown error"}`);
+      toast({
+        title: "Execution failed",
+        description: "Failed to execute code. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   const tabConfig: Record<WorkspaceTab, { label: string; icon: typeof Code; placeholder: string }> = {
@@ -89,6 +133,16 @@ export const Workspace = () => {
           <Button
             variant="outline"
             size="sm"
+            onClick={handleRun}
+            disabled={isRunning || activeTab === "notes"}
+            className="gap-2"
+          >
+            <Play className="w-4 h-4" />
+            {isRunning ? "Running..." : "Run"}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleClear}
             className="gap-2"
           >
@@ -125,15 +179,21 @@ export const Workspace = () => {
         </TabsList>
 
         {Object.entries(tabConfig).map(([key, config]) => (
-          <TabsContent key={key} value={key} className="flex-1 p-4 m-0">
-            <Card className="h-full border-border bg-card/50 backdrop-blur-sm">
+          <TabsContent key={key} value={key} className="flex-1 p-4 m-0 flex flex-col gap-4">
+            <Card className="flex-1 border-border bg-card/50 backdrop-blur-sm">
               <Textarea
                 value={content[key as WorkspaceTab]}
                 onChange={(e) => handleContentChange(e.target.value)}
                 placeholder={config.placeholder}
-                className="h-full min-h-[500px] font-mono text-sm resize-none border-0 bg-transparent focus-visible:ring-0"
+                className="h-full min-h-[300px] font-mono text-sm resize-none border-0 bg-transparent focus-visible:ring-0"
               />
             </Card>
+            {key !== "notes" && (
+              <Card className="border-border bg-card/50 backdrop-blur-sm p-4 min-h-[150px]">
+                <div className="text-xs text-muted-foreground mb-2 font-semibold">Output:</div>
+                <pre className="font-mono text-sm whitespace-pre-wrap">{output || "Run your code to see output here..."}</pre>
+              </Card>
+            )}
           </TabsContent>
         ))}
       </Tabs>
