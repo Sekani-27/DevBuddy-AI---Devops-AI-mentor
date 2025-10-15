@@ -64,8 +64,6 @@ Simply start a conversation with DevBuddy by:
 
 This project is built and deployed using Lovable.dev platform, providing a seamless development and hosting experience.
 
-### Edit the Project
-You can edit this project directly in Lovable.dev by clicking the "Edit with Lovable" badge.
 
 ## 🤝 Contributing
 
