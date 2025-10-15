@@ -1,5 +1,5 @@
 # DevBuddy - Your AI DevOps Tutor
-
+![DevBuddy Banner](https://github.com/Sekani-27/DevBuddy-AI---Devops-AI-mentor/blob/main/DevBuddy%20banner.png?raw=true)
 
 ## 🚀 Overview
 
